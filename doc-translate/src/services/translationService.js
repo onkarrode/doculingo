@@ -1,3 +1,5 @@
+const API_URL = "https://doculingo-backend.onrender.com";
+
 const translateText = async (text, targetLanguage) => {
   if (!text.trim()) {
     throw new Error("Text is required for translation.");
@@ -8,7 +10,7 @@ const translateText = async (text, targetLanguage) => {
   }
 
   const response = await fetch(
-    "http://localhost:5000/api/translate",
+    `${API_URL}/api/translate`,
     {
       method: "POST",
       headers: {
@@ -22,11 +24,17 @@ const translateText = async (text, targetLanguage) => {
   );
 
   if (!response.ok) {
-    const errorData = await response.json();
+    let errorMessage = "Translation request failed.";
 
-    throw new Error(
-      errorData.message || "Translation request failed."
-    );
+    try {
+      const errorData = await response.json();
+      errorMessage =
+        errorData.message || errorMessage;
+    } catch {
+      // Keep the default error message
+    }
+
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
